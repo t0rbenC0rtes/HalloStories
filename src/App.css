@@ -1,0 +1,194 @@
+.app {
+  min-height: 100vh;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: rgba(139, 0, 0, 0.2);
+  border-radius: 12px;
+  border: 2px solid var(--dark-red);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+}
+
+.app-title {
+  font-size: 3.5rem;
+  margin: 0;
+  color: var(--orange);
+  text-shadow: 
+    3px 3px 6px rgba(0, 0, 0, 0.9),
+    0 0 20px rgba(255, 102, 0, 0.5);
+  letter-spacing: 2px;
+}
+
+.app-subtitle {
+  font-size: 1.2rem;
+  color: var(--ghost-white);
+  margin: 0.5rem 0 0 0;
+  font-family: 'Courier New', monospace;
+  opacity: 0.9;
+}
+
+.home-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.main-button {
+  font-size: 1.3rem;
+  padding: 1.2em 2em;
+  width: 100%;
+  border: 3px solid var(--blood-red);
+  background: linear-gradient(135deg, var(--dark-red) 0%, var(--darker-red) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.main-button::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 102, 0, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.main-button:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.main-button span {
+  position: relative;
+  z-index: 1;
+}
+
+.main-button.secondary {
+  border-color: var(--dark-orange);
+  background: linear-gradient(135deg, var(--dark-orange) 0%, var(--dark-red) 100%);
+}
+
+.game-stats {
+  background: rgba(42, 0, 0, 0.6);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 2px solid var(--darker-red);
+  text-align: center;
+  min-width: 300px;
+}
+
+.game-stats p {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+  color: var(--ghost-white);
+  font-family: 'Courier New', monospace;
+}
+
+.voting-status {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  transition: all 0.4s ease;
+  border: 2px solid transparent;
+}
+
+.voting-status.all-voted {
+  background: rgba(0, 139, 0, 0.2);
+  border-color: rgba(0, 255, 0, 0.3);
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+}
+
+.voting-status.waiting {
+  background: rgba(139, 0, 0, 0.2);
+  border-color: rgba(255, 0, 0, 0.3);
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.2);
+}
+
+.status-indicator {
+  font-size: 2rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.status-message {
+  font-size: 1rem;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  color: var(--ghost-white);
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.reset-button {
+  margin-top: 2rem;
+  background: var(--gray);
+  border-color: var(--light-gray);
+  color: var(--light-gray);
+  font-size: 0.9rem;
+  padding: 0.6em 1em;
+}
+
+.reset-button:hover {
+  background: var(--dark-red);
+  border-color: var(--blood-red);
+  color: var(--orange);
+}
+
+.back-button {
+  background: var(--gray);
+  border-color: var(--light-gray);
+  color: var(--ghost-white);
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+.back-button:hover {
+  background: var(--dark-gray);
+  border-color: var(--blood-red);
+  color: var(--orange);
+}
+
+@media (max-width: 768px) {
+  .app {
+    padding: 1rem;
+  }
+
+  .app-title {
+    font-size: 2.5rem;
+  }
+
+  .main-button {
+    font-size: 1.1rem;
+  }
+}

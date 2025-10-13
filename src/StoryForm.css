@@ -1,0 +1,98 @@
+.story-form-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: rgba(26, 26, 26, 0.8);
+  border-radius: 12px;
+  border: 2px solid var(--dark-red);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+}
+
+.form-title {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  color: var(--orange);
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.9);
+}
+
+.story-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 1.1rem;
+  color: var(--orange);
+  font-weight: 600;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.8em;
+  font-size: 1rem;
+  background-color: var(--dark-gray);
+  border: 2px solid var(--dark-red);
+  color: var(--ghost-white);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 200px;
+  font-family: 'Courier New', monospace;
+  line-height: 1.6;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--blood-red);
+  box-shadow: 0 0 15px rgba(139, 0, 0, 0.5);
+  background-color: var(--black);
+}
+
+.submit-button {
+  margin-top: 1rem;
+  font-size: 1.3rem;
+  padding: 1em 2em;
+  background: linear-gradient(135deg, var(--blood-red) 0%, var(--dark-red) 100%);
+  border: 3px solid var(--blood-red);
+  color: var(--orange);
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.submit-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(139, 0, 0, 0.7);
+  background: linear-gradient(135deg, #a00000 0%, var(--blood-red) 100%);
+}
+
+.submit-button:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .story-form-container {
+    padding: 1rem;
+  }
+
+  .form-title {
+    font-size: 2rem;
+  }
+
+  .form-group textarea {
+    min-height: 150px;
+  }
+}
