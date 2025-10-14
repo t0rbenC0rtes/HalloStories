@@ -314,7 +314,7 @@ function App() {
 									<div className="game-stats">
 										<p>
 											📚 {approvedStories.length}{" "}
-											histoires approuvées
+											histoires envoyées
 										</p>
 										<p>🗳️ {votes.length} votes exprimés</p>
 										<div
