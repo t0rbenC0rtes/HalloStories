@@ -54,6 +54,7 @@ function StoryForm({ onSubmit, onBack, playerName, setPlayerName }) {
 				
 				<h2 className="form-title">📝 Qui êtes-vous ?</h2>
 				<p className="form-subtitle">Entrez votre nom pour continuer</p>
+				<p className="form-subtitle" style={{color:"red",fontFamily:"roboto",background:"white"}}>ATTENTION, veuillez utiliser votre pseudo twitch pour qu'on puisse vous reconnaître. Ce pseudo est définitif et ne peut être modifié.</p>
 				
 				<form className="player-name-form" onSubmit={handleNameSubmit}>
 					<input
