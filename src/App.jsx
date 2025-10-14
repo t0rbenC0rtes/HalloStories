@@ -6,6 +6,7 @@ import Stories from "./Stories";
 import VotingSection from "./VotingSection";
 import Results from "./Results";
 import AdminModeration from "./AdminModeration";
+import { storiesApi, votesApi, gameApi } from "./api";
 
 function App() {
 	const [currentView, setCurrentView] = useState("home");
@@ -13,68 +14,80 @@ function App() {
 	const [votes, setVotes] = useState([]);
 	const [playerName, setPlayerName] = useState("");
 	const [showRulesModal, setShowRulesModal] = useState(false);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
 
-	// Load data from localStorage on mount
+	// Load data from API on mount
 	useEffect(() => {
-		const savedStories = localStorage.getItem("hallostories_stories");
-		const savedVotes = localStorage.getItem("hallostories_votes");
-		const savedPlayerName = localStorage.getItem(
-			"hallostories_player_name"
-		);
+		const loadData = async () => {
+			try {
+				setLoading(true);
+				const [storiesData, votesData] = await Promise.all([
+					storiesApi.getAll(),
+					votesApi.getAll(),
+				]);
+				setStories(storiesData);
+				setVotes(votesData);
 
-		if (savedStories) {
-			setStories(JSON.parse(savedStories));
-		}
-		if (savedVotes) {
-			setVotes(JSON.parse(savedVotes));
-		}
-		if (savedPlayerName) {
-			setPlayerName(savedPlayerName);
-		}
+				// Load player name from localStorage (still client-side only)
+				const savedPlayerName = localStorage.getItem("hallostories_player_name");
+				if (savedPlayerName) {
+					setPlayerName(savedPlayerName);
+				}
+			} catch (err) {
+				console.error('Failed to load data:', err);
+				setError('Impossible de charger les données. Vérifiez que le serveur est démarré.');
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		loadData();
+		
+		// Poll for updates every 5 seconds
+		const interval = setInterval(loadData, 5000);
+		return () => clearInterval(interval);
 	}, []);
 
-	// Save stories to localStorage whenever they change
-	useEffect(() => {
-		if (stories.length > 0) {
-			localStorage.setItem(
-				"hallostories_stories",
-				JSON.stringify(stories)
+	const addStory = async (story) => {
+		try {
+			const newStory = await storiesApi.create(story);
+			setStories([...stories, newStory]);
+			setCurrentView("home");
+		} catch (err) {
+			console.error('Failed to add story:', err);
+			alert('Erreur lors de la soumission de l\'histoire. Réessayez.');
+		}
+	};
+
+	const approveStory = async (storyId) => {
+		try {
+			const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
+			const updatedStory = await storiesApi.approve(storyId, adminPassword);
+			setStories(
+				stories.map((story) =>
+					story.id === storyId ? updatedStory : story
+				)
 			);
+		} catch (err) {
+			console.error('Failed to approve story:', err);
+			alert('Erreur lors de l\'approbation de l\'histoire.');
 		}
-	}, [stories]);
-
-	// Save votes to localStorage whenever they change
-	useEffect(() => {
-		if (votes.length > 0) {
-			localStorage.setItem("hallostories_votes", JSON.stringify(votes));
-		}
-	}, [votes]);
-
-	const addStory = (story) => {
-		const newStory = {
-			id: Date.now() + Math.random(),
-			...story,
-			status: "pending", // All new stories start as pending
-			timestamp: new Date().toISOString(),
-		};
-		setStories([...stories, newStory]);
-		setCurrentView("home"); // Navigate back to home after submitting story
 	};
 
-	const approveStory = (storyId) => {
-		setStories(
-			stories.map((story) =>
-				story.id === storyId ? { ...story, status: "approved" } : story
-			)
-		);
-	};
-
-	const rejectStory = (storyId) => {
-		setStories(
-			stories.map((story) =>
-				story.id === storyId ? { ...story, status: "rejected" } : story
-			)
-		);
+	const rejectStory = async (storyId) => {
+		try {
+			const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
+			const updatedStory = await storiesApi.reject(storyId, adminPassword);
+			setStories(
+				stories.map((story) =>
+					story.id === storyId ? updatedStory : story
+				)
+			);
+		} catch (err) {
+			console.error('Failed to reject story:', err);
+			alert('Erreur lors du rejet de l\'histoire.');
+		}
 	};
 
 	const handleSetPlayerName = (name) => {
@@ -82,8 +95,14 @@ function App() {
 		localStorage.setItem("hallostories_player_name", name);
 	};
 
-	const addVote = (vote) => {
-		setVotes([...votes, vote]);
+	const addVote = async (vote) => {
+		try {
+			const newVote = await votesApi.create(vote);
+			setVotes([...votes, newVote]);
+		} catch (err) {
+			console.error('Failed to add vote:', err);
+			alert(err.message || 'Erreur lors de la soumission du vote.');
+		}
 	};
 
 	// Check if all participants have voted
@@ -178,22 +197,52 @@ function App() {
 		(story) => story.status === "approved"
 	);
 
-	const handleResetGame = () => {
+	const handleResetGame = async () => {
 		if (
 			window.confirm(
 				"Êtes-vous sûr de vouloir réinitialiser toutes les histoires et votes ?"
 			)
 		) {
-			setStories([]);
-			setVotes([]);
-			setPlayerName("");
-			localStorage.removeItem("hallostories_stories");
-			localStorage.removeItem("hallostories_votes");
-			localStorage.removeItem("hallostories_player_name");
-			localStorage.removeItem("hallostories_voter_name");
-			setCurrentView("home");
+			try {
+				const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
+				await gameApi.reset(adminPassword);
+				setStories([]);
+				setVotes([]);
+				setPlayerName("");
+				localStorage.removeItem("hallostories_player_name");
+				setCurrentView("home");
+				alert("Jeu réinitialisé avec succès ! 🎃");
+			} catch (err) {
+				console.error('Failed to reset game:', err);
+				alert('Erreur lors de la réinitialisation du jeu.');
+			}
 		}
 	};
+
+	if (loading) {
+		return (
+			<div className="app">
+				<div className="loading-container">
+					<h1 className="loading-title">🎃 Chargement...</h1>
+					<p>Connexion au serveur...</p>
+				</div>
+			</div>
+		);
+	}
+
+	if (error) {
+		return (
+			<div className="app">
+				<div className="error-container">
+					<h1 className="error-title">❌ Erreur</h1>
+					<p>{error}</p>
+					<button className="main-button" onClick={() => window.location.reload()}>
+						Réessayer
+					</button>
+				</div>
+			</div>
+		);
+	}
 
 	return (
 		<Routes>
