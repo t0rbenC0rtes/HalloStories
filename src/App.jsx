@@ -44,8 +44,19 @@ function App() {
 
 		loadData();
 		
-		// Poll for updates every 5 seconds
-		const interval = setInterval(loadData, 5000);
+		// Poll for updates every 30 seconds (only fetch data, don't reload page)
+		const interval = setInterval(async () => {
+			try {
+				const [storiesData, votesData] = await Promise.all([
+					storiesApi.getAll(),
+					votesApi.getAll(),
+				]);
+				setStories(storiesData);
+				setVotes(votesData);
+			} catch (err) {
+				console.error('Failed to refresh data:', err);
+			}
+		}, 30000); // 30 seconds
 		return () => clearInterval(interval);
 	}, []);
 
