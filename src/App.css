@@ -40,6 +40,28 @@
   gap: 2rem;
 }
 
+.home-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.side-gif {
+  width: 350px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 20px rgba(0, 0, 0, 1)) 
+          drop-shadow(0 0 40px rgba(0, 0, 0, 0.5))
+          drop-shadow(0 0 60px rgba(0, 0, 0,1));
+}
+
+.left-gif {
+  transform: scaleX(-1);
+}
+
 .button-container {
   display: flex;
   flex-direction: column;
@@ -219,5 +241,19 @@
 
   .main-button {
     font-size: 1.1rem;
+  }
+
+  .home-content {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .side-gif {
+    width: 150px;
+  }
+
+  .left-gif,
+  .right-gif {
+    display: none;
   }
 }

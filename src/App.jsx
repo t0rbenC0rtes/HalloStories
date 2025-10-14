@@ -149,12 +149,12 @@ function App() {
 		}
 	};
 
-	const resetGame = () => {
-		if (!checkPassword()) {
-			alert("Mot de passe incorrect ! 🎃");
-			return;
-		}
 
+
+	// Filter approved stories for regular views
+	const approvedStories = stories.filter(story => story.status === "approved");
+
+	const handleResetGame = () => {
 		if (
 			window.confirm(
 				"Êtes-vous sûr de vouloir réinitialiser toutes les histoires et votes ?"
@@ -171,9 +171,6 @@ function App() {
 		}
 	};
 
-	// Filter approved stories for regular views
-	const approvedStories = stories.filter(story => story.status === "approved");
-
 	return (
 		<Routes>
 			<Route path="/admin" element={
@@ -181,6 +178,7 @@ function App() {
 					stories={stories}
 					onApprove={approveStory}
 					onReject={rejectStory}
+					onResetGame={handleResetGame}
 				/>
 			} />
 			<Route path="/" element={
@@ -194,13 +192,16 @@ function App() {
 
 					{currentView === "home" && (
 				<div className="home-view">
-					<div className="button-container">
-						<button
-							className="main-button"
-							onClick={() => setCurrentView("submit")}
-						>
-							📝 Envoyer une Histoire
-						</button>
+					<div className="home-content">
+						<img src="/morphwings.gif" alt="Halloween decoration" className="side-gif left-gif" />
+						
+						<div className="button-container">
+							<button
+								className="main-button"
+								onClick={() => setCurrentView("submit")}
+							>
+								📝 Envoyer une Histoire
+							</button>
 						<button
 							className="main-button"
 							onClick={() => setCurrentView("stories")}
@@ -226,7 +227,11 @@ function App() {
 						>
 							🏆 Voir les Résultats
 						</button>
+						</div>
+						
+						<img src="/morphwings.gif" alt="Halloween decoration" className="side-gif right-gif" />
 					</div>
+					
 					{approvedStories.length > 0 && (
 						<div className="game-stats">
 							<p>📚 {approvedStories.length} histoires approuvées</p>
@@ -241,9 +246,6 @@ function App() {
 							</div>
 						</div>
 					)}
-					<button className="reset-button" onClick={resetGame}>
-						Réinitialiser le Jeu
-					</button>
 				</div>
 			)}
 

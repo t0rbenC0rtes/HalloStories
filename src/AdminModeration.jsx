@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./AdminModeration.css";
 
-function AdminModeration({ stories, onApprove, onReject }) {
+function AdminModeration({ stories, onApprove, onReject, onResetGame }) {
 	const [password, setPassword] = useState("");
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -123,6 +123,12 @@ function AdminModeration({ stories, onApprove, onReject }) {
 					)}
 				</div>
 			)}
+
+			<div className="admin-actions">
+				<button className="reset-game-button" onClick={onResetGame}>
+					🔄 Réinitialiser le Jeu
+				</button>
+			</div>
 		</div>
 	);
 }
