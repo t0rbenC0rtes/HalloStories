@@ -10,7 +10,7 @@ function StoryForm({ onSubmit, onBack }) {
 		e.preventDefault();
 		
 		if (!name.trim() || !title.trim() || !story.trim()) {
-			alert("Please fill in all fields!");
+			alert("Veuillez remplir tous les champs !");
 			return;
 		}
 
@@ -25,55 +25,55 @@ function StoryForm({ onSubmit, onBack }) {
 		setTitle("");
 		setStory("");
 
-		alert("Story submitted successfully! 🎃");
+		alert("Histoire soumise avec succès ! 🎃");
 	};
 
 	return (
 		<div className="story-form-container">
 			<button className="back-button" onClick={onBack}>
-				← Back to Home
+				← Retour à l'Accueil
 			</button>
 			
-			<h2 className="form-title">📝 Submit Your Spooky Story</h2>
+			<h2 className="form-title">📝 Soumettez votre Histoire Effrayante</h2>
 			
 			<form className="story-form" onSubmit={handleSubmit}>
 				<div className="form-group">
-					<label htmlFor="name">Your Name</label>
+					<label htmlFor="name">Votre Nom</label>
 					<input
 						type="text"
 						id="name"
 						value={name}
 						onChange={(e) => setName(e.target.value)}
-						placeholder="Enter your name..."
+						placeholder="Entrez votre nom..."
 						maxLength={50}
 					/>
 				</div>
 
 				<div className="form-group">
-					<label htmlFor="title">Story Title</label>
+					<label htmlFor="title">Titre de l'Histoire</label>
 					<input
 						type="text"
 						id="title"
 						value={title}
 						onChange={(e) => setTitle(e.target.value)}
-						placeholder="A short, mysterious title..."
+						placeholder="Un titre court et mystérieux..."
 						maxLength={100}
 					/>
 				</div>
 
 				<div className="form-group">
-					<label htmlFor="story">Your Story</label>
+					<label htmlFor="story">Votre Histoire</label>
 					<textarea
 						id="story"
 						value={story}
 						onChange={(e) => setStory(e.target.value)}
-						placeholder="Tell us your spooky tale..."
+						placeholder="Racontez-nous votre conte macabre..."
 						rows={10}
 					/>
 				</div>
 
 				<button type="submit" className="submit-button">
-					🎃 Submit Story
+					🎃 Soumettre l'Histoire
 				</button>
 			</form>
 		</div>

@@ -51,20 +51,20 @@ function Results({ stories, votes, onBack }) {
 	return (
 		<div className="results-container">
 			<button className="back-button" onClick={onBack}>
-				← Back to Home
+				← Retour à l'Accueil
 			</button>
 			
-			<h2 className="results-title">🏆 Leaderboard</h2>
-			<p className="results-subtitle">Who knows their friends best?</p>
+			<h2 className="results-title">🏆 Classement</h2>
+			<p className="results-subtitle">Qui connaît le mieux ses amis ?</p>
 
 			<div className="results-stats">
 				<div className="stat-box">
 					<div className="stat-number">{stories.length}</div>
-					<div className="stat-label">Stories</div>
+					<div className="stat-label">Histoires</div>
 				</div>
 				<div className="stat-box">
 					<div className="stat-number">{uniqueVoters.length}</div>
-					<div className="stat-label">Voters</div>
+					<div className="stat-label">Votants</div>
 				</div>
 				<div className="stat-box">
 					<div className="stat-number">{votes.length}</div>
@@ -73,7 +73,7 @@ function Results({ stories, votes, onBack }) {
 			</div>
 
 			{leaderboard.length === 0 ? (
-				<p className="no-results">No votes yet... Start guessing! 👻</p>
+				<p className="no-results">Aucun vote pour le moment... Commencez à deviner ! 👻</p>
 			) : (
 				<div className="leaderboard">
 					{leaderboard.map((player, index) => (
@@ -90,7 +90,7 @@ function Results({ stories, votes, onBack }) {
 							<div className="player-info">
 								<div className="player-name">{player.voter}</div>
 								<div className="player-score">
-									{player.correct} correct out of {player.total} guesses
+									{player.correct} correctes sur {player.total} réponses
 								</div>
 							</div>
 							<div className="percentage">{player.percentage}%</div>
@@ -100,7 +100,7 @@ function Results({ stories, votes, onBack }) {
 			)}
 
 			<div className="story-reveal">
-				<h3>📚 Story Authors Revealed</h3>
+				<h3>📚 Auteurs des Histoires Révélés</h3>
 				<div className="reveal-list">
 					{stories.map((story, index) => (
 						<div key={story.id} className="reveal-item">
@@ -108,7 +108,7 @@ function Results({ stories, votes, onBack }) {
 								<span className="reveal-number">#{index + 1}</span>
 								<span>{story.title}</span>
 							</div>
-							<div className="reveal-author">by {story.author}</div>
+							<div className="reveal-author">par {story.author}</div>
 						</div>
 					))}
 				</div>

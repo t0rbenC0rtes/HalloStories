@@ -24,7 +24,7 @@ function VotingSection({ stories, votes, onVote, onBack }) {
 	const handleNameSubmit = (e) => {
 		e.preventDefault();
 		if (!voterName.trim()) {
-			alert("Please enter your name!");
+			alert("Veuillez entrer votre nom !");
 			return;
 		}
 		setHasEnteredName(true);
@@ -33,12 +33,12 @@ function VotingSection({ stories, votes, onVote, onBack }) {
 	const handleVote = (storyId, guessedAuthor) => {
 		// Check if already voted on this story
 		if (userVotes[storyId]) {
-			alert("You've already voted on this story! Votes cannot be changed.");
+			alert("Vous avez déjà voté pour cette histoire ! Les votes ne peuvent pas être modifiés.");
 			return;
 		}
 
 		if (!guessedAuthor) {
-			alert("Please select an author!");
+			alert("Veuillez sélectionner un auteur !");
 			return;
 		}
 
@@ -55,30 +55,30 @@ function VotingSection({ stories, votes, onVote, onBack }) {
 			[storyId]: guessedAuthor
 		});
 
-		alert("Vote recorded! 🎃");
+		alert("Vote enregistré ! 🎃");
 	};
 
 	if (!hasEnteredName) {
 		return (
 			<div className="voting-container">
 				<button className="back-button" onClick={onBack}>
-					← Back to Home
+					← Retour à l'Accueil
 				</button>
 				
-				<h2 className="voting-title">🗳️ Enter Voting</h2>
-				<p className="voting-subtitle">Who are you?</p>
+				<h2 className="voting-title">🗳️ Entrer dans le Vote</h2>
+				<p className="voting-subtitle">Qui êtes-vous ?</p>
 
 				<form className="voter-name-form" onSubmit={handleNameSubmit}>
 					<input
 						type="text"
 						value={voterName}
 						onChange={(e) => setVoterName(e.target.value)}
-						placeholder="Enter your name..."
+						placeholder="Entrez votre nom..."
 						maxLength={50}
 						className="voter-name-input"
 					/>
 					<button type="submit" className="enter-voting-button">
-						Enter Voting Area
+						Entrer dans l'Espace Vote
 					</button>
 				</form>
 			</div>
@@ -88,20 +88,20 @@ function VotingSection({ stories, votes, onVote, onBack }) {
 	return (
 		<div className="voting-container">
 			<button className="back-button" onClick={onBack}>
-				← Back to Home
+				← Retour à l'Accueil
 			</button>
 			
-			<h2 className="voting-title">🗳️ Guess the Authors</h2>
-			<p className="voting-subtitle">Voting as: <strong>{voterName}</strong></p>
+			<h2 className="voting-title">🗳️ Devinez les Auteurs</h2>
+			<p className="voting-subtitle">Vous votez en tant que : <strong>{voterName}</strong></p>
 
 			<div className="voting-list">
 				{stories.map((story, index) => (
 					<div key={story.id} className="voting-card">
-						<div className="voting-story-number">Story #{index + 1}</div>
+						<div className="voting-story-number">Histoire #{index + 1}</div>
 						<h3 className="voting-story-title">{story.title}</h3>
 						
 						<div className="voting-controls">
-							<label htmlFor={`vote-${story.id}`}>Who wrote this?</label>
+							<label htmlFor={`vote-${story.id}`}>Qui a écrit ceci ?</label>
 							<div className="voting-input-group">
 								<select
 									id={`vote-${story.id}`}
@@ -113,7 +113,7 @@ function VotingSection({ stories, votes, onVote, onBack }) {
 										}
 									}}
 								>
-									<option value="">-- Select Author --</option>
+									<option value="">-- Sélectionnez un Auteur --</option>
 									{authors.map(author => (
 										<option key={author} value={author}>
 											{author}
@@ -122,7 +122,7 @@ function VotingSection({ stories, votes, onVote, onBack }) {
 								</select>
 								{userVotes[story.id] && (
 									<span className="vote-locked">
-										✓ Voted: {userVotes[story.id]}
+										✓ Voté : {userVotes[story.id]}
 									</span>
 								)}
 							</div>
@@ -132,7 +132,7 @@ function VotingSection({ stories, votes, onVote, onBack }) {
 			</div>
 
 			<div className="voting-stats">
-				<p>You've voted on {Object.keys(userVotes).length} of {stories.length} stories</p>
+				<p>Vous avez voté pour {Object.keys(userVotes).length} sur {stories.length} histoires</p>
 			</div>
 		</div>
 	);

@@ -55,7 +55,7 @@ function App() {
 
 	// Check if all participants have voted
 	const checkVotingStatus = () => {
-		if (stories.length === 0) return { allVoted: false, message: "No stories yet" };
+		if (stories.length === 0) return { allVoted: false, message: "Aucune histoire pour le moment" };
 
 		// Get all unique participants (story authors + voters)
 		const storyAuthors = [...new Set(stories.map(s => s.author))];
@@ -75,15 +75,15 @@ function App() {
 			totalVotes: votes.length,
 			expectedVotes: allParticipants.length * expectedVotesPerPerson,
 			message: votingComplete && allParticipants.length > 0
-				? "All players have voted! ✓"
-				: `Waiting for votes... (${votes.length}/${allParticipants.length * expectedVotesPerPerson})`
+				? "Tous les joueurs ont voté ! ✓"
+				: `En attente de votes... (${votes.length}/${allParticipants.length * expectedVotesPerPerson})`
 		};
 	};
 
 	const votingStatus = checkVotingStatus();
 
 	const checkPassword = () => {
-		const password = prompt("Enter admin password:");
+		const password = prompt("Entrez le mot de passe administrateur :");
 		return password === import.meta.env.VITE_ADMIN_PASSWORD;
 	};
 
@@ -91,19 +91,19 @@ function App() {
 		if (checkPassword()) {
 			setCurrentView("results");
 		} else {
-			alert("Incorrect password! 🎃");
+			alert("Mot de passe incorrect ! 🎃");
 		}
 	};
 
 	const resetGame = () => {
 		if (!checkPassword()) {
-			alert("Incorrect password! 🎃");
+			alert("Mot de passe incorrect ! 🎃");
 			return;
 		}
 
 		if (
 			window.confirm(
-				"Are you sure you want to reset all stories and votes?"
+				"Êtes-vous sûr de vouloir réinitialiser toutes les histoires et votes ?"
 			)
 		) {
 			setStories([]);
@@ -119,7 +119,7 @@ function App() {
 			<header className="app-header">
 				<h1 className="app-title">🎃 HalloStories 🎃</h1>
 				<p className="app-subtitle">
-					Guess who wrote each spooky tale...
+					Devinez qui a écrit chaque histoire macabre...
 				</p>
 			</header>
 
@@ -130,33 +130,33 @@ function App() {
 							className="main-button"
 							onClick={() => setCurrentView("submit")}
 						>
-							📝 Send a Story
+							📝 Envoyer une Histoire
 						</button>
 						<button
 							className="main-button"
 							onClick={() => setCurrentView("stories")}
 							disabled={stories.length === 0}
 						>
-							📖 Read Stories
+							📖 Lire les Histoires
 						</button>
 						<button
 							className="main-button"
 							onClick={() => setCurrentView("voting")}
 							disabled={stories.length === 0}
 						>
-							🗳️ Vote & Guess
+							🗳️ Voter & Deviner
 						</button>
 						<button
 							className="main-button secondary"
 							onClick={handleResultsClick}
 						>
-							🏆 View Results
+							🏆 Voir les Résultats
 						</button>
 					</div>
 					{stories.length > 0 && (
 						<div className="game-stats">
-							<p>📚 {stories.length} stories submitted</p>
-							<p>🗳️ {votes.length} votes cast</p>
+							<p>📚 {stories.length} histoires soumises</p>
+							<p>🗳️ {votes.length} votes exprimés</p>
 							<div className={`voting-status ${votingStatus.allVoted ? 'all-voted' : 'waiting'}`}>
 								<div className="status-indicator">
 									{votingStatus.allVoted ? '🟢' : '🔴'}
@@ -168,7 +168,7 @@ function App() {
 						</div>
 					)}
 					<button className="reset-button" onClick={resetGame}>
-						Reset Game
+						Réinitialiser le Jeu
 					</button>
 				</div>
 			)}
