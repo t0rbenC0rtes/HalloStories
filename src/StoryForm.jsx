@@ -1,35 +1,76 @@
 import { useState } from "react";
 import "./StoryForm.css";
 
-function StoryForm({ onSubmit, onBack }) {
-	const [name, setName] = useState("");
+function StoryForm({ onSubmit, onBack, playerName, setPlayerName }) {
+	const [name, setName] = useState(playerName || "");
 	const [title, setTitle] = useState("");
 	const [story, setStory] = useState("");
 	const [isReal, setIsReal] = useState("");
+	const [showNamePrompt, setShowNamePrompt] = useState(!playerName);
+
+	const handleNameSubmit = (e) => {
+		e.preventDefault();
+		if (!name.trim()) {
+			alert("Veuillez entrer votre nom !");
+			return;
+		}
+		setPlayerName(name.trim());
+		setShowNamePrompt(false);
+	};
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		
-		if (!name.trim() || !title.trim() || !story.trim() || !isReal) {
+		if (!title.trim() || !story.trim() || !isReal) {
 			alert("Veuillez remplir tous les champs !");
 			return;
 		}
 
+		if (!window.confirm("Êtes-vous sûr de vouloir soumettre cette histoire ? Elle ne pourra pas être modifiée.")) {
+			return;
+		}
+
 		onSubmit({
-			author: name.trim(),
+			author: playerName,
 			title: title.trim(),
 			story: story.trim(),
 			isReal: isReal === "true"
 		});
 
-		// Reset form
-		setName("");
+		// Reset form (but keep player name)
 		setTitle("");
 		setStory("");
 		setIsReal("");
 
 		alert("Histoire soumise avec succès ! 🎃");
 	};
+
+	if (showNamePrompt) {
+		return (
+			<div className="story-form-container">
+				<button className="back-button" onClick={onBack}>
+					← Retour à l'Accueil
+				</button>
+				
+				<h2 className="form-title">📝 Qui êtes-vous ?</h2>
+				<p className="form-subtitle">Entrez votre nom pour continuer</p>
+				
+				<form className="player-name-form" onSubmit={handleNameSubmit}>
+					<input
+						type="text"
+						value={name}
+						onChange={(e) => setName(e.target.value)}
+						placeholder="Entrez votre nom..."
+						maxLength={50}
+						className="player-name-input"
+					/>
+					<button type="submit" className="submit-button">
+						Continuer
+					</button>
+				</form>
+			</div>
+		);
+	}
 
 	return (
 		<div className="story-form-container">
@@ -38,20 +79,9 @@ function StoryForm({ onSubmit, onBack }) {
 			</button>
 			
 			<h2 className="form-title">📝 Soumettez votre Histoire Effrayante</h2>
+			<p className="form-subtitle">Auteur : <strong>{playerName}</strong></p>
 			
 			<form className="story-form" onSubmit={handleSubmit}>
-				<div className="form-group">
-					<label htmlFor="name">Votre Nom</label>
-					<input
-						type="text"
-						id="name"
-						value={name}
-						onChange={(e) => setName(e.target.value)}
-						placeholder="Entrez votre nom..."
-						maxLength={50}
-					/>
-				</div>
-
 				<div className="form-group">
 					<label htmlFor="title">Titre de l'Histoire</label>
 					<input

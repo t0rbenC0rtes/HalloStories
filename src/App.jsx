@@ -9,17 +9,22 @@ function App() {
 	const [currentView, setCurrentView] = useState("home");
 	const [stories, setStories] = useState([]);
 	const [votes, setVotes] = useState([]);
+	const [playerName, setPlayerName] = useState("");
 
 	// Load data from localStorage on mount
 	useEffect(() => {
 		const savedStories = localStorage.getItem("hallostories_stories");
 		const savedVotes = localStorage.getItem("hallostories_votes");
+		const savedPlayerName = localStorage.getItem("hallostories_player_name");
 
 		if (savedStories) {
 			setStories(JSON.parse(savedStories));
 		}
 		if (savedVotes) {
 			setVotes(JSON.parse(savedVotes));
+		}
+		if (savedPlayerName) {
+			setPlayerName(savedPlayerName);
 		}
 	}, []);
 
@@ -47,6 +52,12 @@ function App() {
 			timestamp: new Date().toISOString(),
 		};
 		setStories([...stories, newStory]);
+		setCurrentView("home"); // Navigate back to home after submitting story
+	};
+
+	const handleSetPlayerName = (name) => {
+		setPlayerName(name);
+		localStorage.setItem("hallostories_player_name", name);
 	};
 
 	const addVote = (vote) => {
@@ -134,8 +145,11 @@ function App() {
 		) {
 			setStories([]);
 			setVotes([]);
+			setPlayerName("");
 			localStorage.removeItem("hallostories_stories");
 			localStorage.removeItem("hallostories_votes");
+			localStorage.removeItem("hallostories_player_name");
+			localStorage.removeItem("hallostories_voter_name");
 			setCurrentView("home");
 		}
 	};
@@ -208,6 +222,8 @@ function App() {
 				<StoryForm
 					onSubmit={addStory}
 					onBack={() => setCurrentView("home")}
+					playerName={playerName}
+					setPlayerName={handleSetPlayerName}
 				/>
 			)}
 
@@ -224,6 +240,8 @@ function App() {
 					votes={votes}
 					onVote={addVote}
 					onBack={() => setCurrentView("home")}
+					playerName={playerName}
+					setPlayerName={handleSetPlayerName}
 				/>
 			)}
 

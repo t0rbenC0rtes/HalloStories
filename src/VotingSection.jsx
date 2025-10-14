@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import "./VotingSection.css";
 
-function VotingSection({ stories, votes, onVote, onBack }) {
-	const [voterName, setVoterName] = useState("");
-	const [hasEnteredName, setHasEnteredName] = useState(false);
+function VotingSection({ stories, votes, onVote, onBack, playerName, setPlayerName }) {
+	const [voterName, setVoterName] = useState(playerName || "");
+	const [hasEnteredName, setHasEnteredName] = useState(!!playerName);
+	const [showNamePrompt, setShowNamePrompt] = useState(!playerName);
 	const [userVotes, setUserVotes] = useState({});
 	const [pendingVotes, setPendingVotes] = useState({});
 
@@ -12,8 +13,8 @@ function VotingSection({ stories, votes, onVote, onBack }) {
 
 	// Check which stories this voter has already voted on
 	useEffect(() => {
-		if (hasEnteredName && voterName) {
-			const myVotes = votes.filter(v => v.voter === voterName);
+		if (hasEnteredName && playerName) {
+			const myVotes = votes.filter(v => v.voter === playerName);
 			const votesMap = {};
 			myVotes.forEach(v => {
 				votesMap[v.storyId] = {
@@ -23,7 +24,7 @@ function VotingSection({ stories, votes, onVote, onBack }) {
 			});
 			setUserVotes(votesMap);
 		}
-	}, [hasEnteredName, voterName, votes]);
+	}, [hasEnteredName, playerName, votes]);
 
 	const handleNameSubmit = (e) => {
 		e.preventDefault();
@@ -31,8 +32,9 @@ function VotingSection({ stories, votes, onVote, onBack }) {
 			alert("Veuillez entrer votre nom !");
 			return;
 		}
-		localStorage.setItem("hallostories_voter_name", voterName.trim());
+		setPlayerName(voterName.trim());
 		setHasEnteredName(true);
+		setShowNamePrompt(false);
 	};
 
 	const handleAuthorChange = (storyId, guessedAuthor) => {
@@ -70,7 +72,7 @@ function VotingSection({ stories, votes, onVote, onBack }) {
 
 		if (window.confirm("Confirmer ce vote ? Il ne pourra pas être modifié.")) {
 			onVote({
-				voter: voterName,
+				voter: playerName,
 				storyId: storyId,
 				guessedAuthor: vote.guessedAuthor,
 				guessedReal: vote.guessedReal,
@@ -92,7 +94,7 @@ function VotingSection({ stories, votes, onVote, onBack }) {
 		}
 	};
 
-	if (!hasEnteredName) {
+	if (showNamePrompt) {
 		return (
 			<div className="voting-container">
 				<button className="back-button" onClick={onBack}>
@@ -126,7 +128,7 @@ function VotingSection({ stories, votes, onVote, onBack }) {
 			</button>
 			
 			<h2 className="voting-title">🗳️ Devinez les Auteurs</h2>
-			<p className="voting-subtitle">Vous votez en tant que : <strong>{voterName}</strong></p>
+			<p className="voting-subtitle">Vous votez en tant que : <strong>{playerName}</strong></p>
 
 			<div className="voting-list">
 				{stories.map((story, index) => {
