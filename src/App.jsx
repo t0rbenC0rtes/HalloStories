@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import "./App.css";
 import StoryForm from "./StoryForm";
 import Stories from "./Stories";
 import VotingSection from "./VotingSection";
 import Results from "./Results";
+import AdminModeration from "./AdminModeration";
 
 function App() {
 	const [currentView, setCurrentView] = useState("home");
@@ -49,10 +51,23 @@ function App() {
 		const newStory = {
 			id: Date.now() + Math.random(),
 			...story,
+			status: "pending", // All new stories start as pending
 			timestamp: new Date().toISOString(),
 		};
 		setStories([...stories, newStory]);
 		setCurrentView("home"); // Navigate back to home after submitting story
+	};
+
+	const approveStory = (storyId) => {
+		setStories(stories.map(story =>
+			story.id === storyId ? { ...story, status: "approved" } : story
+		));
+	};
+
+	const rejectStory = (storyId) => {
+		setStories(stories.map(story =>
+			story.id === storyId ? { ...story, status: "rejected" } : story
+		));
 	};
 
 	const handleSetPlayerName = (name) => {
@@ -66,15 +81,16 @@ function App() {
 
 	// Check if all participants have voted
 	const checkVotingStatus = () => {
-		if (stories.length === 0) return { allVoted: false, message: "Aucune histoire pour le moment" };
+		const approvedStories = stories.filter(story => story.status === "approved");
+		if (approvedStories.length === 0) return { allVoted: false, message: "Aucune histoire pour le moment" };
 
 		// Get all unique participants (story authors + voters)
-		const storyAuthors = [...new Set(stories.map(s => s.author))];
+		const storyAuthors = [...new Set(approvedStories.map(s => s.author))];
 		const voters = [...new Set(votes.map(v => v.voter))];
 		const allParticipants = [...new Set([...storyAuthors, ...voters])];
 
 		// Check if each participant has voted on all stories
-		const expectedVotesPerPerson = stories.length;
+		const expectedVotesPerPerson = approvedStories.length;
 		const votingComplete = allParticipants.every(participant => {
 			const participantVotes = votes.filter(v => v.voter === participant).length;
 			return participantVotes === expectedVotesPerPerson;
@@ -95,7 +111,8 @@ function App() {
 
 	// Get voting progress for display on button
 	const getVotingProgress = () => {
-		if (stories.length === 0) return null;
+		const approvedStories = stories.filter(story => story.status === "approved");
+		if (approvedStories.length === 0) return null;
 		
 		// Try to get voter name from recent votes or localStorage
 		const recentVoter = votes.length > 0 ? votes[votes.length - 1].voter : null;
@@ -109,10 +126,10 @@ function App() {
 		}
 
 		const userVotes = votes.filter(v => v.voter === savedVoterName).length;
-		const isComplete = userVotes === stories.length;
+		const isComplete = userVotes === approvedStories.length;
 
 		return {
-			text: `${userVotes}/${stories.length} histoires votées`,
+			text: `${userVotes}/${approvedStories.length} histoires votées`,
 			isComplete: isComplete
 		};
 	};
@@ -154,16 +171,28 @@ function App() {
 		}
 	};
 
-	return (
-		<div className="app">
-			<header className="app-header">
-				<h1 className="app-title">🎃 HalloStories 🎃</h1>
-				<p className="app-subtitle">
-					Devinez qui a écrit chaque histoire macabre...
-				</p>
-			</header>
+	// Filter approved stories for regular views
+	const approvedStories = stories.filter(story => story.status === "approved");
 
-			{currentView === "home" && (
+	return (
+		<Routes>
+			<Route path="/admin" element={
+				<AdminModeration
+					stories={stories}
+					onApprove={approveStory}
+					onReject={rejectStory}
+				/>
+			} />
+			<Route path="/" element={
+				<div className="app">
+					<header className="app-header">
+						<h1 className="app-title">🎃 HalloStories 🎃</h1>
+						<p className="app-subtitle">
+							Devinez qui a écrit chaque histoire macabre...
+						</p>
+					</header>
+
+					{currentView === "home" && (
 				<div className="home-view">
 					<div className="button-container">
 						<button
@@ -175,14 +204,14 @@ function App() {
 						<button
 							className="main-button"
 							onClick={() => setCurrentView("stories")}
-							disabled={stories.length === 0}
+							disabled={approvedStories.length === 0}
 						>
 							📖 Lire les Histoires
 						</button>
 						<button
 							className="main-button voting-button"
 							onClick={() => setCurrentView("voting")}
-							disabled={stories.length === 0}
+							disabled={approvedStories.length === 0}
 						>
 							<span className="button-text">🗳️ Voter & Deviner</span>
 							{votingProgress && (
@@ -198,9 +227,9 @@ function App() {
 							🏆 Voir les Résultats
 						</button>
 					</div>
-					{stories.length > 0 && (
+					{approvedStories.length > 0 && (
 						<div className="game-stats">
-							<p>📚 {stories.length} histoires soumises</p>
+							<p>📚 {approvedStories.length} histoires approuvées</p>
 							<p>🗳️ {votes.length} votes exprimés</p>
 							<div className={`voting-status ${votingStatus.allVoted ? 'all-voted' : 'waiting'}`}>
 								<div className="status-indicator">
@@ -229,14 +258,14 @@ function App() {
 
 			{currentView === "stories" && (
 				<Stories
-					stories={stories}
+					stories={approvedStories}
 					onBack={() => setCurrentView("home")}
 				/>
 			)}
 
 			{currentView === "voting" && (
 				<VotingSection
-					stories={stories}
+					stories={approvedStories}
 					votes={votes}
 					onVote={addVote}
 					onBack={() => setCurrentView("home")}
@@ -247,12 +276,14 @@ function App() {
 
 			{currentView === "results" && (
 				<Results
-					stories={stories}
+					stories={approvedStories}
 					votes={votes}
 					onBack={() => setCurrentView("home")}
 				/>
 			)}
-		</div>
+				</div>
+			} />
+		</Routes>
 	);
 }
 
