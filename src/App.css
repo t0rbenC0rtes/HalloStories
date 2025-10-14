@@ -81,6 +81,35 @@
   z-index: 1;
 }
 
+.main-button.voting-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 1em 2em;
+}
+
+.button-text {
+  font-size: 1.3rem;
+}
+
+.voting-progress {
+  font-size: 0.85rem;
+  font-family: 'Emilys Candy', cursive;
+  font-weight: normal;
+  transition: color 0.3s ease;
+}
+
+.voting-progress.incomplete {
+  color: #ff4444;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.voting-progress.complete {
+  color: #44ff44;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
 .main-button.secondary {
   border-color: var(--dark-orange);
   background: linear-gradient(135deg, var(--dark-orange) 0%, var(--dark-red) 100%);

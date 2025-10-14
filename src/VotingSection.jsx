@@ -5,6 +5,7 @@ function VotingSection({ stories, votes, onVote, onBack }) {
 	const [voterName, setVoterName] = useState("");
 	const [hasEnteredName, setHasEnteredName] = useState(false);
 	const [userVotes, setUserVotes] = useState({});
+	const [pendingVotes, setPendingVotes] = useState({});
 
 	// Get unique author names (no duplicates)
 	const authors = [...new Set(stories.map(story => story.author))].sort();
@@ -15,7 +16,10 @@ function VotingSection({ stories, votes, onVote, onBack }) {
 			const myVotes = votes.filter(v => v.voter === voterName);
 			const votesMap = {};
 			myVotes.forEach(v => {
-				votesMap[v.storyId] = v.guessedAuthor;
+				votesMap[v.storyId] = {
+					guessedAuthor: v.guessedAuthor,
+					guessedReal: v.guessedReal
+				};
 			});
 			setUserVotes(votesMap);
 		}
@@ -27,35 +31,65 @@ function VotingSection({ stories, votes, onVote, onBack }) {
 			alert("Veuillez entrer votre nom !");
 			return;
 		}
+		localStorage.setItem("hallostories_voter_name", voterName.trim());
 		setHasEnteredName(true);
 	};
 
-	const handleVote = (storyId, guessedAuthor) => {
+	const handleAuthorChange = (storyId, guessedAuthor) => {
+		setPendingVotes({
+			...pendingVotes,
+			[storyId]: {
+				...pendingVotes[storyId],
+				guessedAuthor
+			}
+		});
+	};
+
+	const handleRealFakeChange = (storyId, guessedReal) => {
+		setPendingVotes({
+			...pendingVotes,
+			[storyId]: {
+				...pendingVotes[storyId],
+				guessedReal: guessedReal === "true"
+			}
+		});
+	};
+
+	const handleSubmitVote = (storyId) => {
 		// Check if already voted on this story
 		if (userVotes[storyId]) {
 			alert("Vous avez déjà voté pour cette histoire ! Les votes ne peuvent pas être modifiés.");
 			return;
 		}
 
-		if (!guessedAuthor) {
-			alert("Veuillez sélectionner un auteur !");
+		const vote = pendingVotes[storyId];
+		if (!vote || !vote.guessedAuthor || vote.guessedReal === undefined) {
+			alert("Veuillez sélectionner un auteur ET si l'histoire est vraie ou fausse !");
 			return;
 		}
 
-		onVote({
-			voter: voterName,
-			storyId: storyId,
-			guessedAuthor: guessedAuthor,
-			timestamp: new Date().toISOString()
-		});
+		if (window.confirm("Confirmer ce vote ? Il ne pourra pas être modifié.")) {
+			onVote({
+				voter: voterName,
+				storyId: storyId,
+				guessedAuthor: vote.guessedAuthor,
+				guessedReal: vote.guessedReal,
+				timestamp: new Date().toISOString()
+			});
 
-		// Update local state to reflect the vote
-		setUserVotes({
-			...userVotes,
-			[storyId]: guessedAuthor
-		});
+			// Update local state to reflect the vote
+			setUserVotes({
+				...userVotes,
+				[storyId]: vote
+			});
 
-		alert("Vote enregistré ! 🎃");
+			// Clear pending vote
+			const newPending = { ...pendingVotes };
+			delete newPending[storyId];
+			setPendingVotes(newPending);
+
+			alert("Vote enregistré ! 🎃");
+		}
 	};
 
 	if (!hasEnteredName) {
@@ -95,40 +129,76 @@ function VotingSection({ stories, votes, onVote, onBack }) {
 			<p className="voting-subtitle">Vous votez en tant que : <strong>{voterName}</strong></p>
 
 			<div className="voting-list">
-				{stories.map((story, index) => (
-					<div key={story.id} className="voting-card">
-						<div className="voting-story-number">Histoire #{index + 1}</div>
-						<h3 className="voting-story-title">{story.title}</h3>
-						
-						<div className="voting-controls">
-							<label htmlFor={`vote-${story.id}`}>Qui a écrit ceci ?</label>
-							<div className="voting-input-group">
-								<select
-									id={`vote-${story.id}`}
-									disabled={!!userVotes[story.id]}
-									defaultValue=""
-									onChange={(e) => {
-										if (e.target.value) {
-											handleVote(story.id, e.target.value);
-										}
-									}}
-								>
-									<option value="">-- Sélectionnez un Auteur --</option>
-									{authors.map(author => (
-										<option key={author} value={author}>
-											{author}
-										</option>
-									))}
-								</select>
-								{userVotes[story.id] && (
-									<span className="vote-locked">
-										✓ Voté : {userVotes[story.id]}
-									</span>
-								)}
-							</div>
+				{stories.map((story, index) => {
+					const isLocked = !!userVotes[story.id];
+					const pending = pendingVotes[story.id] || {};
+					
+					return (
+						<div key={story.id} className={`voting-card ${isLocked ? 'locked' : ''}`}>
+							<div className="voting-story-number">Histoire #{index + 1}</div>
+							<h3 className="voting-story-title">{story.title}</h3>
+							
+							{isLocked ? (
+								<div className="vote-locked-display">
+									<p>✓ Vote enregistré :</p>
+									<p>Auteur : <strong>{userVotes[story.id].guessedAuthor}</strong></p>
+									<p>Histoire : <strong>{userVotes[story.id].guessedReal ? "Vraie" : "Fausse"}</strong></p>
+								</div>
+							) : (
+								<>
+									<div className="voting-controls">
+										<label htmlFor={`vote-author-${story.id}`}>Qui a écrit ceci ?</label>
+										<select
+											id={`vote-author-${story.id}`}
+											value={pending.guessedAuthor || ""}
+											onChange={(e) => handleAuthorChange(story.id, e.target.value)}
+										>
+											<option value="">-- Sélectionnez un Auteur --</option>
+											{authors.map(author => (
+												<option key={author} value={author}>
+													{author}
+												</option>
+											))}
+										</select>
+									</div>
+
+									<div className="voting-controls">
+										<label>Cette histoire est-elle... ?</label>
+										<div className="radio-group">
+											<label className="radio-label">
+												<input
+													type="radio"
+													name={`real-${story.id}`}
+													value="true"
+													checked={pending.guessedReal === true}
+													onChange={(e) => handleRealFakeChange(story.id, e.target.value)}
+												/>
+												<span>Vraie</span>
+											</label>
+											<label className="radio-label">
+												<input
+													type="radio"
+													name={`real-${story.id}`}
+													value="false"
+													checked={pending.guessedReal === false}
+													onChange={(e) => handleRealFakeChange(story.id, e.target.value)}
+												/>
+												<span>Fausse</span>
+											</label>
+										</div>
+									</div>
+
+									<button 
+										className="vote-button"
+										onClick={() => handleSubmitVote(story.id)}
+									>
+										Voter
+									</button>
+								</>
+							)}
 						</div>
-					</div>
-				))}
+					);
+				})}
 			</div>
 
 			<div className="voting-stats">

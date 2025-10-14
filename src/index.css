@@ -1,5 +1,5 @@
 :root {
-  font-family: 'Creepster', 'Trebuchet MS', system-ui, Arial, sans-serif;
+  font-family: 'Emilys Candy', cursive, system-ui, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -58,7 +58,14 @@ body::before {
   z-index: 1;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1 {
+  font-family: 'Nosifer', cursive;
+  color: var(--orange);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+h2, h3, h4, h5, h6 {
+  font-family: 'Emilys Candy', cursive;
   color: var(--orange);
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
@@ -69,7 +76,7 @@ button {
   padding: 0.8em 1.5em;
   font-size: 1em;
   font-weight: 600;
-  font-family: inherit;
+  font-family: 'Emilys Candy', cursive;
   background: linear-gradient(135deg, var(--dark-red) 0%, var(--darker-red) 100%);
   color: var(--orange);
   cursor: pointer;
@@ -102,7 +109,7 @@ input, textarea, select {
   color: var(--ghost-white);
   padding: 0.6em;
   border-radius: 6px;
-  font-family: 'Courier New', monospace;
+  font-family: 'Emilys Candy', cursive;
   font-size: 1em;
   transition: border-color 0.3s ease;
 }

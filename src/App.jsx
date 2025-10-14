@@ -82,6 +82,32 @@ function App() {
 
 	const votingStatus = checkVotingStatus();
 
+	// Get voting progress for display on button
+	const getVotingProgress = () => {
+		if (stories.length === 0) return null;
+		
+		// Try to get voter name from recent votes or localStorage
+		const recentVoter = votes.length > 0 ? votes[votes.length - 1].voter : null;
+		const savedVoterName = localStorage.getItem("hallostories_voter_name") || recentVoter;
+		
+		if (!savedVoterName) {
+			return {
+				text: "Aucun vote pour le moment",
+				isComplete: false
+			};
+		}
+
+		const userVotes = votes.filter(v => v.voter === savedVoterName).length;
+		const isComplete = userVotes === stories.length;
+
+		return {
+			text: `${userVotes}/${stories.length} histoires votées`,
+			isComplete: isComplete
+		};
+	};
+
+	const votingProgress = getVotingProgress();
+
 	const checkPassword = () => {
 		const password = prompt("Entrez le mot de passe administrateur :");
 		return password === import.meta.env.VITE_ADMIN_PASSWORD;
@@ -140,11 +166,16 @@ function App() {
 							📖 Lire les Histoires
 						</button>
 						<button
-							className="main-button"
+							className="main-button voting-button"
 							onClick={() => setCurrentView("voting")}
 							disabled={stories.length === 0}
 						>
-							🗳️ Voter & Deviner
+							<span className="button-text">🗳️ Voter & Deviner</span>
+							{votingProgress && (
+								<span className={`voting-progress ${votingProgress.isComplete ? 'complete' : 'incomplete'}`}>
+									{votingProgress.text}
+								</span>
+							)}
 						</button>
 						<button
 							className="main-button secondary"

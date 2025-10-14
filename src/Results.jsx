@@ -13,31 +13,43 @@ function Results({ stories, votes, onBack }) {
 			// Initialize voter score if not exists
 			if (!scores[vote.voter]) {
 				scores[vote.voter] = {
-					correct: 0,
-					total: 0
+					points: 0,
+					authorCorrect: 0,
+					realFakeCorrect: 0,
+					totalVotes: 0
 				};
 			}
 
-			scores[vote.voter].total++;
+			scores[vote.voter].totalVotes++;
 
-			// Check if guess was correct
+			// Check if author guess was correct
 			if (vote.guessedAuthor === story.author) {
-				scores[vote.voter].correct++;
+				scores[vote.voter].authorCorrect++;
+				scores[vote.voter].points++;
+			}
+
+			// Check if real/fake guess was correct
+			if (vote.guessedReal === story.isReal) {
+				scores[vote.voter].realFakeCorrect++;
+				scores[vote.voter].points++;
 			}
 		});
 
-		// Convert to array and sort by correct guesses
+		// Convert to array and sort by points
 		return Object.entries(scores)
 			.map(([voter, score]) => ({
 				voter,
-				correct: score.correct,
-				total: score.total,
-				percentage: Math.round((score.correct / score.total) * 100)
+				points: score.points,
+				maxPoints: score.totalVotes * 2,
+				authorCorrect: score.authorCorrect,
+				realFakeCorrect: score.realFakeCorrect,
+				totalVotes: score.totalVotes,
+				percentage: Math.round((score.points / (score.totalVotes * 2)) * 100)
 			}))
 			.sort((a, b) => {
-				// Sort by correct answers first, then by percentage
-				if (b.correct !== a.correct) {
-					return b.correct - a.correct;
+				// Sort by points first, then by percentage
+				if (b.points !== a.points) {
+					return b.points - a.points;
 				}
 				return b.percentage - a.percentage;
 			});
@@ -90,7 +102,11 @@ function Results({ stories, votes, onBack }) {
 							<div className="player-info">
 								<div className="player-name">{player.voter}</div>
 								<div className="player-score">
-									{player.correct} correctes sur {player.total} réponses
+									<strong>{player.points}/{player.maxPoints} points</strong>
+								</div>
+								<div className="player-details">
+									Auteurs : {player.authorCorrect}/{player.totalVotes} • 
+									Vrai/Faux : {player.realFakeCorrect}/{player.totalVotes}
 								</div>
 							</div>
 							<div className="percentage">{player.percentage}%</div>
@@ -100,7 +116,7 @@ function Results({ stories, votes, onBack }) {
 			)}
 
 			<div className="story-reveal">
-				<h3>📚 Auteurs des Histoires Révélés</h3>
+				<h3>📚 Révélations des Histoires</h3>
 				<div className="reveal-list">
 					{stories.map((story, index) => (
 						<div key={story.id} className="reveal-item">
@@ -108,7 +124,10 @@ function Results({ stories, votes, onBack }) {
 								<span className="reveal-number">#{index + 1}</span>
 								<span>{story.title}</span>
 							</div>
-							<div className="reveal-author">par {story.author}</div>
+							<div className="reveal-info">
+								<span className="reveal-author">par {story.author}</span>
+								<span className="reveal-real">{story.isReal ? '✓ Vraie' : '✗ Fausse'}</span>
+							</div>
 						</div>
 					))}
 				</div>
