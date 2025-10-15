@@ -127,12 +127,14 @@ function App() {
 				message: "Aucune histoire pour le moment",
 			};
 
-		// Get all unique participants (story authors + voters)
+		// Get all unique participants who have engaged with the game
+		// - Story authors MUST vote (they submitted stories)
+		// - Anyone who has started voting (has at least 1 vote) MUST complete all votes
 		const storyAuthors = [...new Set(approvedStories.map((s) => s.author))];
 		const voters = [...new Set(votes.map((v) => v.voter))];
 		const allParticipants = [...new Set([...storyAuthors, ...voters])];
 
-		// Check if each participant has voted on all stories
+		// Check if each participant has voted on ALL stories
 		const expectedVotesPerPerson = approvedStories.length;
 		const votingComplete = allParticipants.every((participant) => {
 			const participantVotes = votes.filter(
@@ -140,6 +142,14 @@ function App() {
 			).length;
 			return participantVotes === expectedVotesPerPerson;
 		});
+
+		// Count how many participants have completed voting
+		const completedParticipants = allParticipants.filter((participant) => {
+			const participantVotes = votes.filter(
+				(v) => v.voter === participant
+			).length;
+			return participantVotes === expectedVotesPerPerson;
+		}).length;
 
 		return {
 			allVoted: votingComplete && allParticipants.length > 0,
@@ -149,9 +159,7 @@ function App() {
 			message:
 				votingComplete && allParticipants.length > 0
 					? "Tous les joueurs ont voté ! ✓"
-					: `En attente de votes... (${votes.length}/${
-							allParticipants.length * expectedVotesPerPerson
-					  })`,
+					: `En attente de votes... (${completedParticipants}/${allParticipants.length} joueurs ont terminé)`,
 		};
 	};
 
