@@ -17,9 +17,14 @@ function VotingSection({ stories, votes, onVote, onBack, playerName, setPlayerNa
 			const myVotes = votes.filter(v => v.voter === playerName);
 			const votesMap = {};
 			myVotes.forEach(v => {
-				votesMap[v.storyId] = {
-					guessedAuthor: v.guessedAuthor,
-					guessedReal: v.guessedReal
+				// Handle both snake_case (from Supabase) and camelCase (legacy)
+				const storyId = v.story_id || v.storyId;
+				const guessedAuthor = v.guessed_author || v.guessedAuthor;
+				const guessedReal = v.guessed_real !== undefined ? v.guessed_real : v.guessedReal;
+				
+				votesMap[storyId] = {
+					guessedAuthor: guessedAuthor,
+					guessedReal: guessedReal
 				};
 			});
 			setUserVotes(votesMap);

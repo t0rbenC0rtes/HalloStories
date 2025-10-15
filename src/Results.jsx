@@ -6,9 +6,18 @@ function Results({ stories, votes, onBack }) {
 		const scores = {};
 
 		votes.forEach(vote => {
+			// Handle both snake_case (from Supabase) and camelCase (legacy)
+			const storyId = vote.story_id || vote.storyId;
+			const guessedAuthor = vote.guessed_author || vote.guessedAuthor;
+			const guessedReal = vote.guessed_real !== undefined ? vote.guessed_real : vote.guessedReal;
+			
 			// Find the actual author of the story
-			const story = stories.find(s => s.id === vote.storyId);
+			const story = stories.find(s => String(s.id) === String(storyId));
 			if (!story) return;
+
+			// Handle snake_case for story fields too
+			const storyAuthor = story.author;
+			const storyIsReal = story.is_real !== undefined ? story.is_real : story.isReal;
 
 			// Initialize voter score if not exists
 			if (!scores[vote.voter]) {
@@ -23,13 +32,13 @@ function Results({ stories, votes, onBack }) {
 			scores[vote.voter].totalVotes++;
 
 			// Check if author guess was correct
-			if (vote.guessedAuthor === story.author) {
+			if (guessedAuthor === storyAuthor) {
 				scores[vote.voter].authorCorrect++;
 				scores[vote.voter].points++;
 			}
 
 			// Check if real/fake guess was correct
-			if (vote.guessedReal === story.isReal) {
+			if (guessedReal === storyIsReal) {
 				scores[vote.voter].realFakeCorrect++;
 				scores[vote.voter].points++;
 			}
