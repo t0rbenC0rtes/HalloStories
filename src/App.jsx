@@ -6,6 +6,7 @@ import Stories from "./Stories";
 import VotingSection from "./VotingSection";
 import Results from "./Results";
 import AdminModeration from "./AdminModeration";
+import PasswordModal from "./PasswordModal";
 import { storiesApi, votesApi, gameApi } from "./api";
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
 	const [votes, setVotes] = useState([]);
 	const [playerName, setPlayerName] = useState("");
 	const [showRulesModal, setShowRulesModal] = useState(false);
+	const [showPasswordModal, setShowPasswordModal] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 
@@ -198,17 +200,18 @@ function App() {
 
 	const votingProgress = getVotingProgress();
 
-	const checkPassword = () => {
-		const password = prompt("Entrez le mot de passe administrateur :");
-		return password === import.meta.env.VITE_ADMIN_PASSWORD;
+	const handlePasswordSubmit = (password) => {
+		if (password === import.meta.env.VITE_ADMIN_PASSWORD) {
+			setShowPasswordModal(false);
+			setCurrentView("results");
+		} else {
+			setShowPasswordModal(false);
+			alert("Mot de passe incorrect ! 🎃");
+		}
 	};
 
 	const handleResultsClick = () => {
-		if (checkPassword()) {
-			setCurrentView("results");
-		} else {
-			alert("Mot de passe incorrect ! 🎃");
-		}
+		setShowPasswordModal(true);
 	};
 
 	// Filter approved stories for regular views
@@ -552,6 +555,13 @@ function App() {
 								onBack={() => setCurrentView("home")}
 							/>
 						)}
+
+						<PasswordModal
+							isOpen={showPasswordModal}
+							onClose={() => setShowPasswordModal(false)}
+							onSubmit={handlePasswordSubmit}
+							title="Accès aux Résultats"
+						/>
 					</div>
 				}
 			/>
