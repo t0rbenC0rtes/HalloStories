@@ -29,6 +29,10 @@ function AdminModeration({ stories, onApprove, onReject, onResetGame }) {
 							onChange={(e) => setPassword(e.target.value)}
 							placeholder="Mot de passe..."
 							className="admin-password-input"
+							autoComplete="off"
+							autoCorrect="off"
+							autoCapitalize="off"
+							spellCheck="false"
 						/>
 						<button type="submit" className="admin-login-button">
 							Se Connecter
