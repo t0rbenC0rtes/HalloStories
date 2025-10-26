@@ -127,18 +127,23 @@ function Results({ stories, votes, onBack }) {
 			<div className="story-reveal">
 				<h3>📚 Révélations des Histoires</h3>
 				<div className="reveal-list">
-					{stories.map((story, index) => (
-						<div key={story.id} className="reveal-item">
-							<div className="reveal-title">
-								<span className="reveal-number">#{index + 1}</span>
-								<span>{story.title}</span>
+					{stories.map((story, index) => {
+						// Handle both snake_case (from Supabase) and camelCase (legacy)
+						const storyIsReal = story.is_real !== undefined ? story.is_real : story.isReal;
+						
+						return (
+							<div key={story.id} className="reveal-item">
+								<div className="reveal-title">
+									<span className="reveal-number">#{index + 1}</span>
+									<span>{story.title}</span>
+								</div>
+								<div className="reveal-info">
+									<span className="reveal-author">par {story.author}</span>
+									<span className="reveal-real">{storyIsReal ? '✓ Vraie' : '✗ Fausse'}</span>
+								</div>
 							</div>
-							<div className="reveal-info">
-								<span className="reveal-author">par {story.author}</span>
-								<span className="reveal-real">{story.isReal ? '✓ Vraie' : '✗ Fausse'}</span>
-							</div>
-						</div>
-					))}
+						);
+					})}
 				</div>
 			</div>
 		</div>
