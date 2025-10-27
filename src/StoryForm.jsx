@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./StoryForm.css";
 
-function StoryForm({ onSubmit, onBack, playerName, setPlayerName }) {
+function StoryForm({ onSubmit, onBack, playerName, setPlayerName, showMessage }) {
 	const [name, setName] = useState(playerName || "");
 	const [title, setTitle] = useState("");
 	const [story, setStory] = useState("");
@@ -11,7 +11,7 @@ function StoryForm({ onSubmit, onBack, playerName, setPlayerName }) {
 	const handleNameSubmit = (e) => {
 		e.preventDefault();
 		if (!name.trim()) {
-			alert("Veuillez entrer votre nom !");
+			showMessage("Veuillez entrer votre nom !", "warning");
 			return;
 		}
 		setPlayerName(name.trim());
@@ -22,7 +22,7 @@ function StoryForm({ onSubmit, onBack, playerName, setPlayerName }) {
 		e.preventDefault();
 		
 		if (!title.trim() || !story.trim() || !isReal) {
-			alert("Veuillez remplir tous les champs !");
+			showMessage("Veuillez remplir tous les champs !", "warning");
 			return;
 		}
 
@@ -42,7 +42,7 @@ function StoryForm({ onSubmit, onBack, playerName, setPlayerName }) {
 		setStory("");
 		setIsReal("");
 
-		alert("Histoire soumise avec succès ! 🎃");
+		showMessage("Histoire soumise avec succès ! 🎃", "success");
 	};
 
 	if (showNamePrompt) {

@@ -7,6 +7,7 @@ import VotingSection from "./VotingSection";
 import Results from "./Results";
 import AdminModeration from "./AdminModeration";
 import PasswordModal from "./PasswordModal";
+import MessageModal from "./MessageModal";
 import { storiesApi, votesApi, gameApi } from "./api";
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
 	const [playerName, setPlayerName] = useState("");
 	const [showRulesModal, setShowRulesModal] = useState(false);
 	const [showPasswordModal, setShowPasswordModal] = useState(false);
+	const [messageModal, setMessageModal] = useState({ isOpen: false, message: "", type: "info" });
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 
@@ -62,6 +64,14 @@ function App() {
 		return () => clearInterval(interval);
 	}, []);
 
+	const showMessage = (message, type = "info") => {
+		setMessageModal({ isOpen: true, message, type });
+	};
+
+	const closeMessage = () => {
+		setMessageModal({ isOpen: false, message: "", type: "info" });
+	};
+
 	const addStory = async (story) => {
 		try {
 			const newStory = await storiesApi.create(story);
@@ -69,7 +79,7 @@ function App() {
 			setCurrentView("home");
 		} catch (err) {
 			console.error('Failed to add story:', err);
-			alert('Erreur lors de la soumission de l\'histoire. Réessayez.');
+			showMessage('Erreur lors de la soumission de l\'histoire. Réessayez.', 'error');
 		}
 	};
 
@@ -84,7 +94,7 @@ function App() {
 			);
 		} catch (err) {
 			console.error('Failed to approve story:', err);
-			alert('Erreur lors de l\'approbation de l\'histoire.');
+			showMessage('Erreur lors de l\'approbation de l\'histoire.', 'error');
 		}
 	};
 
@@ -99,7 +109,7 @@ function App() {
 			);
 		} catch (err) {
 			console.error('Failed to reject story:', err);
-			alert('Erreur lors du rejet de l\'histoire.');
+			showMessage('Erreur lors du rejet de l\'histoire.', 'error');
 		}
 	};
 
@@ -114,7 +124,7 @@ function App() {
 			setVotes([...votes, newVote]);
 		} catch (err) {
 			console.error('Failed to add vote:', err);
-			alert(err.message || 'Erreur lors de la soumission du vote.');
+			showMessage(err.message || 'Erreur lors de la soumission du vote.', 'error');
 		}
 	};
 
@@ -206,7 +216,7 @@ function App() {
 			setCurrentView("results");
 		} else {
 			setShowPasswordModal(false);
-			alert("Mot de passe incorrect ! 🎃");
+			showMessage("Mot de passe incorrect ! 🎃", "error");
 		}
 	};
 
@@ -233,10 +243,10 @@ function App() {
 				setPlayerName("");
 				localStorage.removeItem("hallostories_player_name");
 				setCurrentView("home");
-				alert("Jeu réinitialisé avec succès ! 🎃");
+				showMessage("Jeu réinitialisé avec succès ! 🎃", "success");
 			} catch (err) {
 				console.error('Failed to reset game:', err);
-				alert('Erreur lors de la réinitialisation du jeu.');
+				showMessage('Erreur lors de la réinitialisation du jeu.', 'error');
 			}
 		}
 	};
@@ -527,6 +537,7 @@ function App() {
 								onBack={() => setCurrentView("home")}
 								playerName={playerName}
 								setPlayerName={handleSetPlayerName}
+								showMessage={showMessage}
 							/>
 						)}
 
@@ -545,6 +556,7 @@ function App() {
 								onBack={() => setCurrentView("home")}
 								playerName={playerName}
 								setPlayerName={handleSetPlayerName}
+								showMessage={showMessage}
 							/>
 						)}
 
@@ -561,6 +573,13 @@ function App() {
 							onClose={() => setShowPasswordModal(false)}
 							onSubmit={handlePasswordSubmit}
 							title="Accès aux Résultats"
+						/>
+
+						<MessageModal
+							isOpen={messageModal.isOpen}
+							onClose={closeMessage}
+							message={messageModal.message}
+							type={messageModal.type}
 						/>
 					</div>
 				}

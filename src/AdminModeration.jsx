@@ -1,16 +1,26 @@
 import { useState } from "react";
+import MessageModal from "./MessageModal";
 import "./AdminModeration.css";
 
 function AdminModeration({ stories, onApprove, onReject, onResetGame }) {
 	const [password, setPassword] = useState("");
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
+	const [messageModal, setMessageModal] = useState({ isOpen: false, message: "", type: "info" });
+
+	const showMessage = (message, type = "info") => {
+		setMessageModal({ isOpen: true, message, type });
+	};
+
+	const closeMessage = () => {
+		setMessageModal({ isOpen: false, message: "", type: "info" });
+	};
 
 	const handlePasswordSubmit = (e) => {
 		e.preventDefault();
 		if (password === import.meta.env.VITE_ADMIN_PASSWORD) {
 			setIsAuthenticated(true);
 		} else {
-			alert("Mot de passe incorrect !");
+			showMessage("Mot de passe incorrect !", "error");
 			setPassword("");
 		}
 	};
@@ -133,6 +143,13 @@ function AdminModeration({ stories, onApprove, onReject, onResetGame }) {
 					🔄 Réinitialiser le Jeu
 				</button>
 			</div>
+
+			<MessageModal
+				isOpen={messageModal.isOpen}
+				onClose={closeMessage}
+				message={messageModal.message}
+				type={messageModal.type}
+			/>
 		</div>
 	);
 }

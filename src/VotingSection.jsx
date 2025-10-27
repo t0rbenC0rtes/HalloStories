@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./VotingSection.css";
 
-function VotingSection({ stories, votes, onVote, onBack, playerName, setPlayerName }) {
+function VotingSection({ stories, votes, onVote, onBack, playerName, setPlayerName, showMessage }) {
 	const [voterName, setVoterName] = useState(playerName || "");
 	const [hasEnteredName, setHasEnteredName] = useState(!!playerName);
 	const [showNamePrompt, setShowNamePrompt] = useState(!playerName);
@@ -34,7 +34,7 @@ function VotingSection({ stories, votes, onVote, onBack, playerName, setPlayerNa
 	const handleNameSubmit = (e) => {
 		e.preventDefault();
 		if (!voterName.trim()) {
-			alert("Veuillez entrer votre nom !");
+			showMessage("Veuillez entrer votre nom !", "warning");
 			return;
 		}
 		setPlayerName(voterName.trim());
@@ -65,13 +65,13 @@ function VotingSection({ stories, votes, onVote, onBack, playerName, setPlayerNa
 	const handleSubmitVote = (storyId) => {
 		// Check if already voted on this story
 		if (userVotes[storyId]) {
-			alert("Vous avez déjà voté pour cette histoire ! Les votes ne peuvent pas être modifiés.");
+			showMessage("Vous avez déjà voté pour cette histoire ! Les votes ne peuvent pas être modifiés.", "warning");
 			return;
 		}
 
 		const vote = pendingVotes[storyId];
 		if (!vote || !vote.guessedAuthor || vote.guessedReal === undefined) {
-			alert("Veuillez sélectionner un auteur ET si l'histoire est vraie ou fausse !");
+			showMessage("Veuillez sélectionner un auteur ET si l'histoire est vraie ou fausse !", "warning");
 			return;
 		}
 
@@ -95,7 +95,7 @@ function VotingSection({ stories, votes, onVote, onBack, playerName, setPlayerNa
 			delete newPending[storyId];
 			setPendingVotes(newPending);
 
-			alert("Vote enregistré ! 🎃");
+			showMessage("Vote enregistré ! 🎃", "success");
 		}
 	};
 
