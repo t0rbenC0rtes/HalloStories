@@ -186,13 +186,8 @@ function App() {
 		);
 		if (approvedStories.length === 0) return null;
 
-		// Try to get voter name from recent votes or localStorage
-		const recentVoter =
-			votes.length > 0 ? votes[votes.length - 1].voter : null;
-		const savedVoterName =
-			localStorage.getItem("hallostories_voter_name") || recentVoter;
-
-		if (!savedVoterName) {
+		// Use the current playerName from state
+		if (!playerName) {
 			return {
 				text: "Aucun vote pour le moment",
 				isComplete: false,
@@ -200,7 +195,7 @@ function App() {
 		}
 
 		const userVotes = votes.filter(
-			(v) => v.voter === savedVoterName
+			(v) => v.voter === playerName
 		).length;
 		const isComplete = userVotes === approvedStories.length;
 
