@@ -43,8 +43,7 @@ function Stories({ stories, onBack }) {
 								<div className="story-header">
 									<div className="story-header-left">
 										<div className="story-number">Histoire #{index + 1}</div>
-										<h3 className="story-title">{story.title}</h3>
-										<div className="story-author">par {story.author}</div>
+										<h3 className="story-title">{story.title}</h3>										
 									</div>
 									<div className="expand-icon">
 										{isExpanded ? '▲' : '▼'}
