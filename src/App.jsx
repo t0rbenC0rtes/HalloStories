@@ -8,6 +8,7 @@ import Results from "./Results";
 import AdminModeration from "./AdminModeration";
 import PasswordModal from "./PasswordModal";
 import MessageModal from "./MessageModal";
+import ConfirmModal from "./ConfirmModal";
 import { storiesApi, votesApi, gameApi } from "./api";
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
 	const [playerName, setPlayerName] = useState("");
 	const [showRulesModal, setShowRulesModal] = useState(false);
 	const [showPasswordModal, setShowPasswordModal] = useState(false);
+	const [showResetConfirm, setShowResetConfirm] = useState(false);
 	const [messageModal, setMessageModal] = useState({ isOpen: false, message: "", type: "info" });
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
@@ -229,25 +231,23 @@ function App() {
 		(story) => story.status === "approved"
 	);
 
-	const handleResetGame = async () => {
-		if (
-			window.confirm(
-				"Êtes-vous sûr de vouloir réinitialiser toutes les histoires et votes ?"
-			)
-		) {
-			try {
-				const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
-				await gameApi.reset(adminPassword);
-				setStories([]);
-				setVotes([]);
-				setPlayerName("");
-				localStorage.removeItem("hallostories_player_name");
-				setCurrentView("home");
-				showMessage("Jeu réinitialisé avec succès ! 🎃", "success");
-			} catch (err) {
-				console.error('Failed to reset game:', err);
-				showMessage('Erreur lors de la réinitialisation du jeu.', 'error');
-			}
+	const handleResetGame = () => {
+		setShowResetConfirm(true);
+	};
+
+	const handleConfirmReset = async () => {
+		try {
+			const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
+			await gameApi.reset(adminPassword);
+			setStories([]);
+			setVotes([]);
+			setPlayerName("");
+			localStorage.removeItem("hallostories_player_name");
+			setCurrentView("home");
+			showMessage("Jeu réinitialisé avec succès ! 🎃", "success");
+		} catch (err) {
+			console.error('Failed to reset game:', err);
+			showMessage('Erreur lors de la réinitialisation du jeu.', 'error');
 		}
 	};
 
@@ -580,6 +580,15 @@ function App() {
 							onClose={closeMessage}
 							message={messageModal.message}
 							type={messageModal.type}
+						/>
+
+						<ConfirmModal
+							isOpen={showResetConfirm}
+							onClose={() => setShowResetConfirm(false)}
+							onConfirm={handleConfirmReset}
+							message="Êtes-vous sûr de vouloir réinitialiser toutes les histoires et votes ?"
+							confirmText="Réinitialiser"
+							cancelText="Annuler"
 						/>
 					</div>
 				}

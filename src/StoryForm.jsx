@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ConfirmModal from "./ConfirmModal";
 import "./StoryForm.css";
 
 function StoryForm({ onSubmit, onBack, playerName, setPlayerName, showMessage }) {
@@ -7,6 +8,7 @@ function StoryForm({ onSubmit, onBack, playerName, setPlayerName, showMessage })
 	const [story, setStory] = useState("");
 	const [isReal, setIsReal] = useState("");
 	const [showNamePrompt, setShowNamePrompt] = useState(!playerName);
+	const [showConfirmModal, setShowConfirmModal] = useState(false);
 
 	const handleNameSubmit = (e) => {
 		e.preventDefault();
@@ -26,10 +28,11 @@ function StoryForm({ onSubmit, onBack, playerName, setPlayerName, showMessage })
 			return;
 		}
 
-		if (!window.confirm("Êtes-vous sûr de vouloir soumettre cette histoire ? Elle ne pourra pas être modifiée.")) {
-			return;
-		}
+		// Show confirmation modal
+		setShowConfirmModal(true);
+	};
 
+	const handleConfirmSubmit = () => {
 		onSubmit({
 			author: playerName,
 			title: title.trim(),
@@ -136,6 +139,15 @@ function StoryForm({ onSubmit, onBack, playerName, setPlayerName, showMessage })
 					🎃 Soumettre l'Histoire
 				</button>
 			</form>
+
+			<ConfirmModal
+				isOpen={showConfirmModal}
+				onClose={() => setShowConfirmModal(false)}
+				onConfirm={handleConfirmSubmit}
+				message="Êtes-vous sûr de vouloir soumettre cette histoire ? Elle ne pourra pas être modifiée."
+				confirmText="Soumettre"
+				cancelText="Annuler"
+			/>
 		</div>
 	);
 }

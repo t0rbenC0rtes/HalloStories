@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import ConfirmModal from "./ConfirmModal";
 import "./VotingSection.css";
 
 function VotingSection({ stories, votes, onVote, onBack, playerName, setPlayerName, showMessage }) {
@@ -7,6 +8,7 @@ function VotingSection({ stories, votes, onVote, onBack, playerName, setPlayerNa
 	const [showNamePrompt, setShowNamePrompt] = useState(!playerName);
 	const [userVotes, setUserVotes] = useState({});
 	const [pendingVotes, setPendingVotes] = useState({});
+	const [confirmModal, setConfirmModal] = useState({ isOpen: false, storyId: null });
 
 	// Get unique author names (no duplicates)
 	const authors = [...new Set(stories.map(story => story.author))].sort();
@@ -75,28 +77,34 @@ function VotingSection({ stories, votes, onVote, onBack, playerName, setPlayerNa
 			return;
 		}
 
-		if (window.confirm("Confirmer ce vote ? Il ne pourra pas être modifié.")) {
-			onVote({
-				voter: playerName,
-				storyId: storyId,
-				guessedAuthor: vote.guessedAuthor,
-				guessedReal: vote.guessedReal,
-				timestamp: new Date().toISOString()
-			});
+		// Show confirmation modal
+		setConfirmModal({ isOpen: true, storyId });
+	};
 
-			// Update local state to reflect the vote
-			setUserVotes({
-				...userVotes,
-				[storyId]: vote
-			});
+	const handleConfirmVote = () => {
+		const storyId = confirmModal.storyId;
+		const vote = pendingVotes[storyId];
 
-			// Clear pending vote
-			const newPending = { ...pendingVotes };
-			delete newPending[storyId];
-			setPendingVotes(newPending);
+		onVote({
+			voter: playerName,
+			storyId: storyId,
+			guessedAuthor: vote.guessedAuthor,
+			guessedReal: vote.guessedReal,
+			timestamp: new Date().toISOString()
+		});
 
-			showMessage("Vote enregistré ! 🎃", "success");
-		}
+		// Update local state to reflect the vote
+		setUserVotes({
+			...userVotes,
+			[storyId]: vote
+		});
+
+		// Clear pending vote
+		const newPending = { ...pendingVotes };
+		delete newPending[storyId];
+		setPendingVotes(newPending);
+
+		showMessage("Vote enregistré ! 🎃", "success");
 	};
 
 	if (showNamePrompt) {
@@ -211,6 +219,15 @@ function VotingSection({ stories, votes, onVote, onBack, playerName, setPlayerNa
 			<div className="voting-stats">
 				<p>Vous avez voté pour {Object.keys(userVotes).length} sur {stories.length} histoires</p>
 			</div>
+
+			<ConfirmModal
+				isOpen={confirmModal.isOpen}
+				onClose={() => setConfirmModal({ isOpen: false, storyId: null })}
+				onConfirm={handleConfirmVote}
+				message="Confirmer ce vote ? Il ne pourra pas être modifié."
+				confirmText="Confirmer"
+				cancelText="Annuler"
+			/>
 		</div>
 	);
 }
