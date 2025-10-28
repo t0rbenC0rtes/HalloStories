@@ -8,7 +8,7 @@ function VotingSection({ stories, votes, onVote, onBack, playerName, setPlayerNa
 	const [showNamePrompt, setShowNamePrompt] = useState(!playerName);
 	const [userVotes, setUserVotes] = useState({});
 	const [pendingVotes, setPendingVotes] = useState({});
-	const [confirmModal, setConfirmModal] = useState({ isOpen: false, storyId: null });
+	const [showBatchConfirm, setShowBatchConfirm] = useState(false);
 
 	// Get unique author names (no duplicates)
 	const authors = [...new Set(stories.map(story => story.author))].sort();
@@ -64,47 +64,55 @@ function VotingSection({ stories, votes, onVote, onBack, playerName, setPlayerNa
 		});
 	};
 
-	const handleSubmitVote = (storyId) => {
-		// Check if already voted on this story
-		if (userVotes[storyId]) {
-			showMessage("Vous avez déjà voté pour cette histoire ! Les votes ne peuvent pas être modifiés.", "warning");
-			return;
-		}
-
-		const vote = pendingVotes[storyId];
-		if (!vote || !vote.guessedAuthor || vote.guessedReal === undefined) {
-			showMessage("Veuillez sélectionner un auteur ET si l'histoire est vraie ou fausse !", "warning");
-			return;
-		}
-
-		// Show confirmation modal
-		setConfirmModal({ isOpen: true, storyId });
+	// Get ready votes (complete selections that haven't been submitted yet)
+	const getReadyVotes = () => {
+		const ready = [];
+		Object.entries(pendingVotes).forEach(([storyId, vote]) => {
+			// Only include if not already voted and has both fields filled
+			if (!userVotes[storyId] && vote.guessedAuthor && vote.guessedReal !== undefined) {
+				ready.push({ storyId, ...vote });
+			}
+		});
+		return ready;
 	};
 
-	const handleConfirmVote = () => {
-		const storyId = confirmModal.storyId;
-		const vote = pendingVotes[storyId];
+	const handleBatchSubmit = () => {
+		const readyVotes = getReadyVotes();
+		if (readyVotes.length === 0) {
+			showMessage("Veuillez sélectionner un auteur ET si l'histoire est vraie ou fausse pour au moins une histoire !", "warning");
+			return;
+		}
+		setShowBatchConfirm(true);
+	};
 
-		onVote({
-			voter: playerName,
-			storyId: storyId,
-			guessedAuthor: vote.guessedAuthor,
-			guessedReal: vote.guessedReal,
-			timestamp: new Date().toISOString()
+	const handleConfirmBatchVotes = () => {
+		const readyVotes = getReadyVotes();
+		
+		// Submit all ready votes
+		readyVotes.forEach(({ storyId, guessedAuthor, guessedReal }) => {
+			onVote({
+				voter: playerName,
+				storyId: storyId,
+				guessedAuthor: guessedAuthor,
+				guessedReal: guessedReal,
+				timestamp: new Date().toISOString()
+			});
 		});
 
-		// Update local state to reflect the vote
-		setUserVotes({
-			...userVotes,
-			[storyId]: vote
+		// Update local state to reflect all submitted votes
+		const newUserVotes = { ...userVotes };
+		const newPendingVotes = { ...pendingVotes };
+		
+		readyVotes.forEach(({ storyId, guessedAuthor, guessedReal }) => {
+			newUserVotes[storyId] = { guessedAuthor, guessedReal };
+			delete newPendingVotes[storyId];
 		});
 
-		// Clear pending vote
-		const newPending = { ...pendingVotes };
-		delete newPending[storyId];
-		setPendingVotes(newPending);
+		setUserVotes(newUserVotes);
+		setPendingVotes(newPendingVotes);
 
-		showMessage("Vote enregistré ! 🎃", "success");
+		const count = readyVotes.length;
+		showMessage(`${count} vote${count > 1 ? 's' : ''} enregistré${count > 1 ? 's' : ''} ! 🎃`, "success");
 	};
 
 	if (showNamePrompt) {
@@ -202,13 +210,6 @@ function VotingSection({ stories, votes, onVote, onBack, playerName, setPlayerNa
 											</label>
 										</div>
 									</div>
-
-									<button 
-										className="vote-button"
-										onClick={() => handleSubmitVote(story.id)}
-									>
-										Voter
-									</button>
 								</>
 							)}
 						</div>
@@ -220,11 +221,19 @@ function VotingSection({ stories, votes, onVote, onBack, playerName, setPlayerNa
 				<p>Vous avez voté pour {Object.keys(userVotes).length} sur {stories.length} histoires</p>
 			</div>
 
+			<button 
+				className="batch-vote-button"
+				onClick={handleBatchSubmit}
+				disabled={getReadyVotes().length === 0}
+			>
+				Voter ({getReadyVotes().length} {getReadyVotes().length > 1 ? 'histoires prêtes' : 'histoire prête'})
+			</button>
+
 			<ConfirmModal
-				isOpen={confirmModal.isOpen}
-				onClose={() => setConfirmModal({ isOpen: false, storyId: null })}
-				onConfirm={handleConfirmVote}
-				message="Confirmer ce vote ? Il ne pourra pas être modifié."
+				isOpen={showBatchConfirm}
+				onClose={() => setShowBatchConfirm(false)}
+				onConfirm={handleConfirmBatchVotes}
+				message="Confirmer le vote ? Vous pouvez voter plusieurs fois, mais les votes ne peuvent pas être modifiés."
 				confirmText="Confirmer"
 				cancelText="Annuler"
 			/>
