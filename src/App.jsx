@@ -272,18 +272,19 @@ function App() {
 	}
 
 	return (
-		<Routes>
-			<Route
-				path="/admin"
-				element={
-					<AdminModeration
-						stories={stories}
-						onApprove={approveStory}
-						onReject={rejectStory}
-						onResetGame={handleResetGame}
-					/>
-				}
-			/>
+		<>
+			<Routes>
+				<Route
+					path="/admin"
+					element={
+						<AdminModeration
+							stories={stories}
+							onApprove={approveStory}
+							onReject={rejectStory}
+							onResetGame={handleResetGame}
+						/>
+					}
+				/>
 			<Route
 				path="/"
 				element={
@@ -577,18 +578,20 @@ function App() {
 							type={messageModal.type}
 						/>
 
-						<ConfirmModal
-							isOpen={showResetConfirm}
-							onClose={() => setShowResetConfirm(false)}
-							onConfirm={handleConfirmReset}
-							message="Êtes-vous sûr de vouloir réinitialiser toutes les histoires et votes ?"
-							confirmText="Réinitialiser"
-							cancelText="Annuler"
-						/>
 					</div>
 				}
 			/>
-		</Routes>
+			</Routes>
+
+			<ConfirmModal
+				isOpen={showResetConfirm}
+				onClose={() => setShowResetConfirm(false)}
+				onConfirm={handleConfirmReset}
+				message="Êtes-vous sûr de vouloir réinitialiser toutes les histoires et votes ?"
+				confirmText="Réinitialiser"
+				cancelText="Annuler"
+			/>
+		</>
 	);
 }
 
