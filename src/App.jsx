@@ -342,15 +342,15 @@ function App() {
 										</button>
 										<button
 											className="main-button voting-button"
-											onClick={() =>
-												setCurrentView("voting")
-											}
-											disabled={
-												approvedStories.length === 0
-											}
+											// onClick={() =>
+											// 	setCurrentView("voting")
+											// }
+											// disabled={
+											// 	approvedStories.length === 0
+											// }
 										>
 											<span className="button-text">
-												Voter & Deviner
+												{/* Voter & Deviner */}Les votes ne sont pas encore ouverts.
 											</span>
 											{votingProgress && (
 												<span
