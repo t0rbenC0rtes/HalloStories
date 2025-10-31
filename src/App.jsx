@@ -251,7 +251,7 @@ function App() {
 			<div className="app">
 				<div className="loading-container">
 					<h1 className="loading-title">🎃 Chargement...</h1>
-					<p>Connexion au serveur...</p>
+					<p>Le serveur faisait dodo et tu l'as réveillé. Bravo ! Laisse lui le temps de se faire un café, ça peut prendre jusqu'à 50 secondes.</p>
 				</div>
 			</div>
 		);
